@@ -75,7 +75,7 @@ pub fn main() !void {
 }
 
 test "input1" {
-    const test_input_1 = 
+    const test_input_1 =
         \\
         \\L68
         \\L30
