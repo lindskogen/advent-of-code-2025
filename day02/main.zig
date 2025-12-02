@@ -51,11 +51,10 @@ fn is_invalid(buf: anytype) bool {
         if (@rem(max, len) != 0) {
             continue;
         }
-        var idx: usize = 1;
+        var iter = std.mem.window(u8, buf, len, len);
 
-        while (idx * len + len <= max) : (idx += 1) {
-            const p = len * idx;
-            if (!std.mem.eql(u8, buf[0..len], buf[p .. p + len])) {
+        while (iter.next()) |slice| {
+            if (!std.mem.eql(u8, buf[0..len], slice)) {
                 continue :o;
             }
         }
@@ -112,7 +111,7 @@ test "star 1" {
 }
 
 test "star 2" {
-    try std.testing.expectEqual(55647447017, run_part2(inputfile));
+    try std.testing.expectEqual(55647141923, run_part2(inputfile));
 }
 
 test "is_invalid" {
