@@ -37,6 +37,10 @@ fn run_part1(untrimmed_input: anytype) !usize {
 fn is_invalid(buf: anytype) bool {
     const max = buf.len;
 
+    if (max == 1) {
+        return false;
+    }
+
     if (std.mem.allEqual(u8, buf, buf[0])) {
         return true;
     }
@@ -112,9 +116,13 @@ test "star 2" {
 }
 
 test "is_invalid" {
+    try std.testing.expectEqual(false, is_invalid("1"));
     try std.testing.expectEqual(true, is_invalid("12341234"));
     try std.testing.expectEqual(true, is_invalid("123123123"));
     try std.testing.expectEqual(true, is_invalid("1212121212"));
+    try std.testing.expectEqual(true, is_invalid("38593859"));
+    try std.testing.expectEqual(true, is_invalid("824824824"));
     try std.testing.expectEqual(true, is_invalid("1111111"));
     try std.testing.expectEqual(false, is_invalid("9999999979"));
+    try std.testing.expectEqual(false, is_invalid("799999999"));
 }
