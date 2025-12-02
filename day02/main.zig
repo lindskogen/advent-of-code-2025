@@ -2,7 +2,8 @@ const std = @import("std");
 
 const inputfile = @embedFile("input");
 
-fn run_part1(input: anytype) !usize {
+fn run_part1(untrimmed_input: anytype) !usize {
+    const input = std.mem.trimEnd(u8, untrimmed_input, "\n");
     var buf: [15]u8 = undefined;
     var iterator = std.mem.tokenizeScalar(u8, input, ',');
     var sum: usize = 0;
@@ -10,21 +11,18 @@ fn run_part1(input: anytype) !usize {
     while (iterator.next()) |range| {
         if (std.mem.indexOfScalar(u8, range, '-')) |dashpos| {
             const from = try std.fmt.parseInt(usize, range[0..dashpos], 10);
-            const to = try std.fmt.parseInt(usize, range[dashpos+1..], 10);
-
+            const to = try std.fmt.parseInt(usize, range[dashpos + 1 ..], 10);
             var curr = from;
 
             while (curr <= to) {
                 const max = std.fmt.printInt(&buf, curr, 10, .lower, .{});
                 if (max % 2 != 0) {
                     // 101 (len 3) -> 1000 (len 4)
-                    curr = try std.math.powi(@TypeOf(curr),10, max);
+                    curr = try std.math.powi(@TypeOf(curr), 10, max);
                     continue;
                 }
 
-
                 const p = max / 2;
-
                 if (std.mem.eql(u8, buf[0..p], buf[p..max])) {
                     sum += curr;
                 }
@@ -37,57 +35,50 @@ fn run_part1(input: anytype) !usize {
 }
 
 fn is_invalid(buf: anytype) bool {
-    const max = buf.len-1;
+    const max = buf.len;
 
-    if (std.mem.allEqual(u8, buf[0..max], buf[0])) {
-        std.debug.print("len: {d}, found one: {s}!\n", .{1, buf});
+    if (std.mem.allEqual(u8, buf, buf[0])) {
         return true;
     }
 
-    var len: usize = 2;
+    var len: usize = max / 2;
 
-    o: while (len <= max / 2): (len += 1) {
+    o: while (len > 1) : (len -= 1) {
+        if (@rem(max, len) != 0) {
+            continue;
+        }
         var idx: usize = 1;
 
-        while (idx * len < max): (idx += 1) {
+        while (idx * len + len <= max) : (idx += 1) {
             const p = len * idx;
-            if (!std.mem.eql(u8, buf[0..len], buf[p..p+len])) {
+            if (!std.mem.eql(u8, buf[0..len], buf[p .. p + len])) {
                 continue :o;
             }
         }
-        std.debug.print("len: {d}, found one: {s}!\n", .{len, buf});
         return true;
     }
     return false;
 }
 
-fn run_part2(input: anytype, allocator: std.mem.Allocator) !usize {
+fn run_part2(untrimmed_input: anytype) !usize {
+    const input = std.mem.trimEnd(u8, untrimmed_input, "\n");
     var buf: [15]u8 = undefined;
     var iterator = std.mem.tokenizeScalar(u8, input, ',');
     var sum: usize = 0;
-    var set: std.AutoHashMap(usize, void) = .init(allocator);
 
     while (iterator.next()) |range| {
         if (std.mem.indexOfScalar(u8, range, '-')) |dashpos| {
             const from = try std.fmt.parseInt(usize, range[0..dashpos], 10);
-            const to = try std.fmt.parseInt(usize, range[dashpos+1..], 10);
-
+            const to = try std.fmt.parseInt(usize, range[dashpos + 1 ..], 10);
 
             var curr = from;
-
-            while (curr <= to): (curr += 1) {
+            while (curr <= to) : (curr += 1) {
                 const max = std.fmt.printInt(&buf, curr, 10, .lower, .{});
 
                 if (is_invalid(buf[0..max])) {
-                    try set.put(curr, {});
+                    sum += curr;
                 }
             }
-
-            var iter = set.keyIterator();
-            while (iter.next()) |k| {
-                sum += k.*;
-            }
-            set.clearRetainingCapacity();
         }
     }
 
@@ -109,9 +100,7 @@ test "input1" {
 }
 
 test "input2" {
-    var general_purpose_allocator: std.heap.GeneralPurposeAllocator(.{}) = .init;
-    const gpa = general_purpose_allocator.allocator();
-    try std.testing.expectEqual(4174379265, run_part2(test_input, gpa));
+    try std.testing.expectEqual(4174379265, run_part2(test_input));
 }
 
 test "star 1" {
@@ -119,9 +108,7 @@ test "star 1" {
 }
 
 test "star 2" {
-    var general_purpose_allocator: std.heap.GeneralPurposeAllocator(.{}) = .init;
-    const gpa = general_purpose_allocator.allocator();
-    try std.testing.expectEqual(55647447017, run_part2(inputfile, gpa));
+    try std.testing.expectEqual(55647447017, run_part2(inputfile));
 }
 
 test "is_invalid" {
@@ -129,4 +116,5 @@ test "is_invalid" {
     try std.testing.expectEqual(true, is_invalid("123123123"));
     try std.testing.expectEqual(true, is_invalid("1212121212"));
     try std.testing.expectEqual(true, is_invalid("1111111"));
+    try std.testing.expectEqual(false, is_invalid("9999999979"));
 }
