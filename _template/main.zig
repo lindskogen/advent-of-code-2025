@@ -23,20 +23,19 @@ pub fn main() !void {
     std.debug.print("Part 2: {d}\n", .{p2});
 }
 
-const test_input = "";
 
 test "input1" {
-    try std.testing.expectEqual(1227775554, run_part1(test_input));
+    try std.testing.expectEqual(1227775554, run_part1(example_input));
 }
 
 test "input2" {
-    try std.testing.expectEqual(4174379265, run_part2(test_input));
+    try std.testing.expectEqual(4174379265, run_part2(example_input));
 }
 
-test "star 1" {
+test "star1" {
     try std.testing.expectEqual(44854383294, run_part1(inputfile));
 }
 
-test "star 2" {
+test "star2" {
     try std.testing.expectEqual(55647141923, run_part2(inputfile));
 }
