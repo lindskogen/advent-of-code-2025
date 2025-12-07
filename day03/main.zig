@@ -30,8 +30,6 @@ fn run_part1(input: anytype) !usize {
     return sum;
 }
 
-const State = struct { nbrs: [12]u8, indices_idx: usize, line_idx: usize };
-
 fn evaluate(nbrs: []const u8) usize {
     var collect: usize = 0;
     for (0..nbrs.len) |i| {
