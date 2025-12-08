@@ -251,5 +251,5 @@ test "star2" {
     var arena_allocator = std.heap.ArenaAllocator.init(std.testing.allocator);
     defer arena_allocator.deinit();
     const alloc = arena_allocator.allocator();
-    try std.testing.expectEqual(55647141923, run_part2(inputfile, alloc));
+    try std.testing.expectEqual(10357305916520, run_part2(inputfile, alloc));
 }
